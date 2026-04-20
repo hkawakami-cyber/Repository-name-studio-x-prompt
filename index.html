@@ -4,498 +4,416 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Studio-X | Prompt Generator</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  :root {
-    --navy: #12384C; --teal: #79BFA8; --soft-cyan: #A7D6CF;
-    --bg: #F5F7F8; --border: #E2E8EF; --body: #1a1a1a;
-    --muted: #64748B; --white: #ffffff; --orange: #D47A2A;
-    --gold: #AE953B;
-  }
-  body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--body); min-height: 100vh; display: flex; flex-direction: column; }
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --navy:#12384C;--teal:#79BFA8;--cyan:#A7D6CF;
+  --bg:#F4F6F8;--border:#E2E8EF;--white:#fff;
+  --body:#1a1a1a;--muted:#64748B;--orange:#D47A2A;
+  --gold:#AE953B;
+}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--body);min-height:100vh;display:flex;flex-direction:column;}
 
-  header { background: var(--navy); padding: 0 1.5rem; height: 52px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-  .logo { color: var(--white); font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-  .logo-accent { color: var(--teal); }
-  .header-sub { color: var(--soft-cyan); font-size: 11px; }
+/* HEADER */
+header{background:var(--navy);padding:0 2rem;height:54px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.logo{color:#fff;font-size:17px;font-weight:700;display:flex;align-items:center;gap:9px;}
+.logo-dot{width:7px;height:7px;background:var(--teal);border-radius:50%;}
+.header-tag{background:rgba(121,191,168,.2);color:var(--cyan);font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.05em;}
 
-  /* Mode bar */
-  .mode-bar { background: var(--white); border-bottom: 1px solid var(--border); padding: 8px 1.5rem; display: flex; align-items: center; gap: 10px; }
-  .mode-label { font-size: 11px; font-weight: 700; color: var(--muted); }
-  .mode-btn { border: 1.5px solid var(--border); background: var(--white); border-radius: 20px; padding: 5px 16px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; color: var(--muted); transition: all 0.15s; }
-  .mode-btn.active { background: var(--navy); color: var(--white); border-color: var(--navy); }
+/* LAYOUT */
+.workspace{display:grid;grid-template-columns:380px 1fr;flex:1;overflow:hidden;height:calc(100vh - 54px);}
 
-  /* How to use */
-  .howto { background: linear-gradient(135deg, #e8f4f8, #f0faf7); border-bottom: 1px solid var(--border); padding: 10px 1.5rem; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
-  .howto-step { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--navy); }
-  .step-num { background: var(--teal); color: var(--white); border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; }
-  .step-arrow { color: var(--muted); font-size: 12px; }
+/* LEFT */
+.left{background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.left-head{padding:14px 18px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.left-head-title{font-size:11px;font-weight:700;color:var(--navy);letter-spacing:.1em;text-transform:uppercase;}
+.left-body{flex:1;overflow-y:auto;padding:18px;}
+.left-body::-webkit-scrollbar{width:3px;}
+.left-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
 
-  /* Main */
-  .main { display: grid; grid-template-columns: 1fr 1fr; flex: 1; gap: 0; }
+/* FIELD */
+.field{margin-bottom:20px;}
+.field-label{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.field-label::after{content:'';flex:1;height:1px;background:var(--border);}
 
-  .pane { border-right: 1px solid var(--border); display: flex; flex-direction: column; }
-  .pane:last-child { border-right: none; }
-  .pane-header { background: var(--white); border-bottom: 1px solid var(--border); padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; }
-  .pane-title { font-size: 11px; font-weight: 700; color: var(--navy); letter-spacing: 0.08em; text-transform: uppercase; }
-  .pane-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; flex: 1; }
+/* MEMO */
+.memo-wrap{position:relative;}
+textarea#memo{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px 28px;font-size:13px;font-family:'Noto Sans JP',sans-serif;resize:vertical;min-height:120px;line-height:1.75;background:#fafbfc;color:var(--body);transition:border-color .2s;}
+textarea#memo:focus{outline:none;border-color:var(--teal);background:#fff;}
+.char-count{position:absolute;bottom:9px;right:11px;font-size:10px;color:#bbb;font-family:'DM Mono',monospace;}
 
-  /* Input */
-  textarea#memo-input { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-size: 13px; font-family: 'Noto Sans JP', sans-serif; resize: vertical; min-height: 160px; line-height: 1.7; background: var(--white); }
-  textarea#memo-input:focus { outline: 2px solid var(--teal); border-color: transparent; }
+/* PURPOSE */
+.purpose-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.p-btn{border:1.5px solid var(--border);background:#fafbfc;border-radius:8px;padding:9px 10px;font-size:12px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;color:var(--muted);font-weight:500;transition:all .15s;text-align:left;display:flex;align-items:center;gap:7px;line-height:1.3;}
+.p-btn .ico{font-size:14px;flex-shrink:0;}
+.p-btn:hover{border-color:var(--teal);color:var(--navy);background:#f0faf7;}
+.p-btn.on{background:var(--navy);color:#fff;border-color:var(--navy);}
 
-  .control-section { background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
-  .control-label { font-size: 11px; font-weight: 700; color: var(--navy); margin-bottom: 8px; letter-spacing: 0.04em; }
+/* CHIPS */
+.chips{display:flex;flex-wrap:wrap;gap:6px;}
+.chip{border:1.5px solid var(--border);background:#fafbfc;border-radius:20px;padding:5px 13px;font-size:11px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;color:var(--muted);font-weight:500;transition:all .15s;white-space:nowrap;}
+.chip:hover{border-color:var(--teal);color:var(--navy);}
+.chip.on{background:var(--teal);color:#fff;border-color:var(--teal);}
+.chip.slack-on{background:#4A154B;color:#fff;border-color:#4A154B;}
 
-  .btn-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
-  .sel-btn { border: 1px solid var(--border); background: var(--white); border-radius: 6px; padding: 7px 5px; font-size: 11px; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; color: var(--muted); font-weight: 500; transition: all 0.15s; text-align: center; }
-  .sel-btn.active { background: var(--teal); color: var(--white); border-color: var(--teal); }
-  .sel-btn:hover:not(.active) { border-color: var(--teal); color: var(--navy); }
-  .sel-btn.fmt.active { background: var(--navy); border-color: var(--navy); }
+/* SLACK SUB */
+.slack-sub{margin-top:8px;padding:10px 12px;background:#faf5fb;border-radius:8px;border:1px solid #e8d8ea;display:none;}
+.slack-sub-label{font-size:10px;color:#7c3e80;font-weight:700;margin-bottom:6px;}
 
-  .slider-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-  .slider-name { font-size: 11px; color: var(--muted); width: 44px; flex-shrink: 0; }
-  .slider-row input[type=range] { flex: 1; accent-color: var(--teal); cursor: pointer; }
-  .slider-labels { display: flex; justify-content: space-between; font-size: 10px; color: #aaa; margin-top: -4px; margin-bottom: 5px; }
+/* OPTIONAL */
+textarea.opt{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;font-size:12px;font-family:'Noto Sans JP',sans-serif;resize:none;height:58px;line-height:1.6;background:#fafbfc;color:var(--body);transition:border-color .2s;}
+textarea.opt:focus{outline:none;border-color:var(--teal);background:#fff;}
+.opt-hint{font-size:10px;color:#bbb;margin-top:4px;}
 
-  .mtg-fields { display: flex; flex-direction: column; gap: 7px; }
-  .mtg-field { display: flex; align-items: center; gap: 8px; }
-  .mtg-field label { font-size: 11px; color: var(--muted); width: 60px; flex-shrink: 0; }
-  .mtg-field input { flex: 1; border: 1px solid var(--border); border-radius: 5px; padding: 5px 8px; font-size: 12px; font-family: 'Noto Sans JP', sans-serif; }
-  .mtg-field input:focus { outline: 1.5px solid var(--teal); }
+/* GEN BTN */
+.gen-btn{width:100%;background:var(--orange);color:#fff;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all .2s;letter-spacing:.04em;box-shadow:0 4px 14px rgba(212,122,42,.25);}
+.gen-btn:hover{background:#c06d24;transform:translateY(-1px);}
+.gen-btn:active{transform:translateY(0);}
 
-  .persona-input { width: 100%; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; font-size: 12px; font-family: 'Noto Sans JP', sans-serif; min-height: 60px; resize: vertical; }
-  .persona-input:focus { outline: 1.5px solid var(--teal); }
+/* RIGHT */
+.right{display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
+.right-head{background:var(--white);border-bottom:1px solid var(--border);padding:13px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.right-body{flex:1;overflow-y:auto;padding:20px;}
+.right-body::-webkit-scrollbar{width:3px;}
+.right-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
 
-  .generate-btn { width: 100%; background: var(--orange); color: var(--white); border: none; border-radius: 8px; padding: 13px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; transition: background 0.15s; letter-spacing: 0.03em; }
-  .generate-btn:hover { background: #b8661e; }
+/* HINT */
+.hint{background:linear-gradient(135deg,#f0faf7,#e8f4f8);border:1px solid var(--teal);border-radius:10px;padding:14px 16px;margin-bottom:16px;}
+.hint-title{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.hint-steps{display:flex;flex-direction:column;gap:5px;}
+.hint-step{font-size:12px;color:var(--navy);display:flex;align-items:flex-start;gap:8px;line-height:1.6;}
+.h-num{background:var(--teal);color:#fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;margin-top:2px;}
 
-  /* Mode panels */
-  .mode-panel { display: none; }
-  .mode-panel.active { display: contents; }
+/* CARD */
+.card{background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(18,56,76,.08);margin-bottom:12px;}
+.card-head{background:var(--navy);color:#fff;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;}
+.card-label{font-size:12px;font-weight:700;}
+.copy-btn{background:var(--teal);color:#fff;border:none;border-radius:6px;padding:4px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all .15s;}
+.copy-btn:hover{background:#5fa898;}
+.copy-btn.done{background:var(--gold);}
+.card-body{padding:14px 16px;font-size:12px;line-height:1.9;white-space:pre-wrap;word-break:break-all;color:var(--body);max-height:360px;overflow-y:auto;font-family:'DM Mono',monospace;background:#fafbfc;}
+.card-body::-webkit-scrollbar{width:3px;}
+.card-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
 
-  /* Output */
-  .output-area { background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 14px; flex: 1; min-height: 200px; display: flex; flex-direction: column; gap: 10px; }
+/* EMPTY */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:55%;gap:10px;color:var(--muted);text-align:center;padding:40px;}
+.empty-icon{font-size:44px;opacity:.15;}
+.empty-title{font-size:14px;font-weight:700;color:var(--navy);opacity:.4;}
+.empty-sub{font-size:12px;line-height:1.7;opacity:.6;}
 
-  .prompt-block { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-  .prompt-block-header { background: var(--navy); color: var(--white); padding: 7px 12px; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: space-between; }
-  .prompt-block-body { padding: 12px; font-size: 12px; line-height: 1.8; white-space: pre-wrap; word-break: break-all; color: var(--body); max-height: 280px; overflow-y: auto; }
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 22px;border-radius:20px;font-size:12px;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;}
 
-  .copy-btn { background: var(--teal); color: var(--white); border: none; border-radius: 4px; padding: 3px 10px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; transition: background 0.15s; white-space: nowrap; }
-  .copy-btn:hover { background: #5fa898; }
-  .copy-btn.copied { background: var(--gold); }
-
-  .how-to-use-box { background: #f0faf7; border: 1px solid var(--teal); border-radius: 8px; padding: 12px 14px; font-size: 12px; line-height: 1.8; color: var(--navy); }
-  .how-to-use-box strong { color: var(--teal); }
-
-  .empty-state { display: flex; align-items: center; justify-content: center; flex: 1; flex-direction: column; gap: 8px; color: var(--muted); font-size: 13px; padding: 40px; text-align: center; }
-  .empty-icon { font-size: 36px; opacity: 0.3; }
-
-  .toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); background: var(--navy); color: var(--white); padding: 9px 20px; border-radius: 18px; font-size: 12px; z-index: 1000; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
-  .toast.show { opacity: 1; }
-
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-  @media (max-width: 768px) {
-    .main { grid-template-columns: 1fr; }
-    .pane { border-right: none; border-bottom: 1px solid var(--border); }
-  }
+@media(max-width:860px){.workspace{grid-template-columns:1fr;height:auto;}.right{min-height:400px;}}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo"><span class="logo-accent">◆</span> Studio-X <span style="color:var(--soft-cyan);font-weight:400;font-size:11px;margin-left:4px">Prompt Generator</span></div>
-  <div class="header-sub">メモ → プロンプト → Claude/Geminiに貼るだけ</div>
+  <div class="logo"><div class="logo-dot"></div>Studio-X</div>
+  <div class="header-tag">PROMPT GENERATOR</div>
 </header>
 
-<!-- How to use -->
-<div class="howto">
-  <div class="howto-step"><span class="step-num">1</span>メモを入力</div>
-  <span class="step-arrow">→</span>
-  <div class="howto-step"><span class="step-num">2</span>設定を選ぶ</div>
-  <span class="step-arrow">→</span>
-  <div class="howto-step"><span class="step-num">3</span>プロンプト生成</div>
-  <span class="step-arrow">→</span>
-  <div class="howto-step"><span class="step-num">4</span>Claude/Geminiに貼り付け</div>
-  <span class="step-arrow">→</span>
-  <div class="howto-step"><span class="step-num">5</span>完成！</div>
-</div>
+<div class="workspace">
 
-<!-- Mode bar -->
-<div class="mode-bar">
-  <span class="mode-label">MODE</span>
-  <button class="mode-btn active" onclick="switchMode('sns')">📣 SNS・発信用</button>
-  <button class="mode-btn" onclick="switchMode('mtg')">📋 議事録・Task用</button>
-</div>
+  <!-- ===== LEFT ===== -->
+  <div class="left">
+    <div class="left-head"><span class="left-head-title">⚙️ 設定</span></div>
+    <div class="left-body">
 
-<div class="main">
-
-  <!-- LEFT: 設定 -->
-  <div class="pane">
-    <div class="pane-header"><span class="pane-title">⚙️ 設定</span></div>
-    <div class="pane-body">
-
-      <textarea id="memo-input" placeholder="ここにメモを入力...&#10;&#10;例）今日の商談で気づいたこと、読んだ記事の感想、伝えたいメッセージなど"></textarea>
-
-      <!-- SNS Controls -->
-      <div id="sns-controls" class="mode-panel active">
-
-        <div class="control-section">
-          <div class="control-label">📐 構造化フレームワーク</div>
-          <div class="btn-grid">
-            <button class="sel-btn active" onclick="sel(this,'struct','PREP法')">PREP法</button>
-            <button class="sel-btn" onclick="sel(this,'struct','SDS法')">SDS法</button>
-            <button class="sel-btn" onclick="sel(this,'struct','WHY→HOW')">WHY→HOW</button>
-            <button class="sel-btn" onclick="sel(this,'struct','STAR法')">STAR法</button>
-            <button class="sel-btn" onclick="sel(this,'struct','問題解決型')">問題解決型</button>
-            <button class="sel-btn" onclick="sel(this,'struct','自由変換')">自由変換</button>
-          </div>
+      <!-- 1. メモ -->
+      <div class="field">
+        <div class="field-label">メモ・素材</div>
+        <div class="memo-wrap">
+          <textarea id="memo" placeholder="会議メモ、書きたい文章、解決したい課題など何でも..." oninput="updateCount()"></textarea>
+          <span class="char-count" id="cc">0文字</span>
         </div>
-
-        <div class="control-section">
-          <div class="control-label">🎛️ トーン・長さ</div>
-          <div class="slider-row"><span class="slider-name">トーン</span><input type="range" id="tone" min="1" max="5" value="3"/></div>
-          <div class="slider-labels"><span>丁寧</span><span>ラフ</span></div>
-          <div class="slider-row"><span class="slider-name">長さ</span><input type="range" id="length" min="1" max="5" value="3"/></div>
-          <div class="slider-labels"><span>短い</span><span>長い</span></div>
-        </div>
-
-        <div class="control-section">
-          <div class="control-label">📤 出力フォーマット（複数選択可）</div>
-          <div class="btn-grid">
-            <button class="sel-btn fmt active" onclick="toggleFmt(this,'X投稿（140文字）')">X投稿</button>
-            <button class="sel-btn fmt" onclick="toggleFmt(this,'note記事')">note記事</button>
-            <button class="sel-btn fmt active" onclick="toggleFmt(this,'Markdown')">Markdown</button>
-          </div>
-        </div>
-
-        <div class="control-section">
-          <div class="control-label">🧠 あなたのペルソナ（任意）</div>
-          <textarea class="persona-input" id="persona" placeholder="例）30代の営業マネージャー。論理的だが熱量がある。専門用語は使わず平易な言葉で話す。"></textarea>
-        </div>
-
       </div>
 
-      <!-- MTG Controls -->
-      <div id="mtg-controls" class="mode-panel">
-
-        <div class="control-section">
-          <div class="control-label">📋 MTG基本情報（任意）</div>
-          <div class="mtg-fields">
-            <div class="mtg-field"><label>MTG名称</label><input type="text" id="mtg-name" placeholder="例）週次定例"/></div>
-            <div class="mtg-field"><label>日時</label><input type="text" id="mtg-date" placeholder="例）2025/4/20"/></div>
-            <div class="mtg-field"><label>参加者</label><input type="text" id="mtg-members" placeholder="例）本村、山田、河上"/></div>
-          </div>
+      <!-- 2. 目的 -->
+      <div class="field">
+        <div class="field-label">何をしたいか</div>
+        <div class="purpose-grid">
+          <button class="p-btn" onclick="selP(this,'議事録をまとめる')"><span class="ico">📋</span>議事録をまとめる</button>
+          <button class="p-btn" onclick="selP(this,'文章を磨く')"><span class="ico">✨</span>文章を磨く</button>
+          <button class="p-btn" onclick="selP(this,'構造化・整理する')"><span class="ico">🗂️</span>構造化・整理する</button>
+          <button class="p-btn" onclick="selP(this,'資料・スライドを作る')"><span class="ico">📊</span>資料を作る</button>
+          <button class="p-btn" onclick="selP(this,'SNS・発信文を作る')"><span class="ico">📣</span>発信文を作る</button>
+          <button class="p-btn" onclick="selP(this,'タスクを分解する')"><span class="ico">✅</span>タスクを分解する</button>
+          <button class="p-btn" onclick="selP(this,'コードを書く')"><span class="ico">💻</span>コードを書く</button>
+          <button class="p-btn" onclick="selP(this,'企画書・仕様書を作る')"><span class="ico">📐</span>企画書・仕様書を作る</button>
         </div>
-
-        <div class="control-section">
-          <div class="control-label">📤 出力フォーマット（複数選択可）</div>
-          <div class="btn-grid">
-            <button class="sel-btn fmt active" onclick="toggleFmt(this,'議事録')">議事録</button>
-            <button class="sel-btn fmt active" onclick="toggleFmt(this,'Taskリスト')">Taskリスト</button>
-            <button class="sel-btn fmt" onclick="toggleFmt(this,'note記事')">note記事</button>
-            <button class="sel-btn fmt" onclick="toggleFmt(this,'X投稿')">X投稿</button>
-            <button class="sel-btn fmt" onclick="toggleFmt(this,'Slack要約')">Slack要約</button>
-          </div>
-        </div>
-
       </div>
 
-      <button class="generate-btn" onclick="generate()">✦ プロンプトを生成する</button>
+      <!-- 3. 相手 -->
+      <div class="field">
+        <div class="field-label">誰に届けるか</div>
+        <div class="chips" id="target-chips">
+          <button class="chip on" onclick="selC(this,'target')">指定なし</button>
+          <button class="chip" onclick="selC(this,'target')">社長・経営層</button>
+          <button class="chip" onclick="selC(this,'target')">上司</button>
+          <button class="chip" onclick="selC(this,'target')">同僚・チーム</button>
+          <button class="chip" onclick="selC(this,'target')">部下</button>
+          <button class="chip" onclick="selC(this,'target')">取引先</button>
+        </div>
+      </div>
 
+      <!-- 4. スタイル（トーン×長さをまとめた） -->
+      <div class="field">
+        <div class="field-label">スタイル</div>
+        <div class="chips" id="style-chips">
+          <button class="chip on" onclick="selC(this,'style')">指定なし</button>
+          <button class="chip" onclick="selC(this,'style')">簡潔に（短く）</button>
+          <button class="chip" onclick="selC(this,'style')">丁寧に（詳しく）</button>
+          <button class="chip" onclick="selC(this,'style')">論理的に</button>
+          <button class="chip" onclick="selC(this,'style')">熱量高めに</button>
+          <button class="chip" onclick="selC(this,'style')">フランクに</button>
+        </div>
+      </div>
+
+      <!-- 5. 出力形式 -->
+      <div class="field">
+        <div class="field-label">出力形式</div>
+        <div class="chips" id="format-chips">
+          <button class="chip on" onclick="selC(this,'format')">指定なし</button>
+          <button class="chip" onclick="selC(this,'format')">箇条書き</button>
+          <button class="chip" onclick="selC(this,'format')">文章形式</button>
+          <button class="chip" onclick="selC(this,'format')">スライド構成</button>
+          <button class="chip" onclick="selC(this,'format')">Markdown</button>
+          <button class="chip" onclick="selC(this,'format')">企画書・仕様書</button>
+          <button class="chip" id="slack-chip" onclick="toggleSlack(this)">Slack投稿</button>
+        </div>
+        <div id="slack-sub" class="slack-sub">
+          <div class="slack-sub-label">絵文字</div>
+          <div class="chips" id="emoji-chips">
+            <button class="chip on" onclick="selC(this,'emoji')">なし</button>
+            <button class="chip" onclick="selC(this,'emoji')">少なめ（！等OK）</button>
+            <button class="chip" onclick="selC(this,'emoji')">多め</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. 段階（折りたたみ式） -->
+      <div class="field">
+        <div class="field-label">段階指定（任意）</div>
+        <div class="chips" id="stage-chips">
+          <button class="chip on" onclick="selC(this,'stage')">一括で出す</button>
+          <button class="chip" onclick="selC(this,'stage')">Step1：構成のみ</button>
+          <button class="chip" onclick="selC(this,'stage')">Step2：詳細を書く</button>
+          <button class="chip" onclick="selC(this,'stage')">Step3：表現を磨く</button>
+        </div>
+      </div>
+
+      <!-- 7. 補足（1つにまとめた） -->
+      <div class="field">
+        <div class="field-label">補足情報（任意）</div>
+        <textarea class="opt" id="extra" placeholder="ゴール・背景・制約条件など何でも。例）読み手は営業チーム10名。専門用語は使わない。"></textarea>
+        <div class="opt-hint">※ここに書いた内容がプロンプトに反映されます</div>
+      </div>
+
+      <button class="gen-btn" onclick="generate()">✦ プロンプトを生成する</button>
+      <div style="height:20px;"></div>
     </div>
   </div>
 
-  <!-- RIGHT: 出力 -->
-  <div class="pane">
-    <div class="pane-header">
-      <span class="pane-title">📋 生成されたプロンプト</span>
+  <!-- ===== RIGHT ===== -->
+  <div class="right">
+    <div class="right-head">
+      <span style="font-size:11px;font-weight:700;color:var(--navy);letter-spacing:.08em;text-transform:uppercase;">📋 生成されたプロンプト</span>
+      <span style="font-size:11px;color:var(--muted);" id="pcount"></span>
     </div>
-    <div class="pane-body">
-
-      <div class="how-to-use-box">
-        💡 生成されたプロンプトを <strong>「📋 コピー」</strong> して、<strong>Claude.ai または Gemini</strong> に貼り付けてください。AIが最適な形で変換してくれます。
-      </div>
-
-      <div id="output-area" class="output-area">
-        <div class="empty-state">
-          <div class="empty-icon">✦</div>
-          <div>左側で設定して「プロンプトを生成する」を押してください</div>
+    <div class="right-body" id="right-body">
+      <div class="hint">
+        <div class="hint-title">💡 使い方</div>
+        <div class="hint-steps">
+          <div class="hint-step"><span class="h-num">1</span>左側でメモを入力し、目的・条件を選ぶ</div>
+          <div class="hint-step"><span class="h-num">2</span>「プロンプトを生成する」を押す</div>
+          <div class="hint-step"><span class="h-num">3</span>「📋 コピー」してClaude.aiまたはGeminiに貼り付ける</div>
+          <div class="hint-step"><span class="h-num">4</span>AIが正確に変換・生成してくれます</div>
         </div>
       </div>
-
+      <div class="empty" id="empty">
+        <div class="empty-icon">✦</div>
+        <div class="empty-title">まだプロンプトがありません</div>
+        <div class="empty-sub">左側で設定して<br>「プロンプトを生成する」を押してください</div>
+      </div>
     </div>
   </div>
-
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-  let currentMode = 'sns';
-  let selectedStruct = 'PREP法';
-  let selectedFormats = new Set(['X投稿（140文字）', 'Markdown']);
+const S={purpose:'',target:'指定なし',style:'指定なし',format:'指定なし',emoji:'なし',stage:'一括で出す',isSlack:false};
 
-  function switchMode(mode) {
-    currentMode = mode;
-    document.querySelectorAll('.mode-btn').forEach((b, i) => {
-      b.classList.toggle('active', (i===0&&mode==='sns')||(i===1&&mode==='mtg'));
-    });
-    document.getElementById('sns-controls').classList.toggle('active', mode==='sns');
-    document.getElementById('mtg-controls').classList.toggle('active', mode==='mtg');
+function updateCount(){document.getElementById('cc').textContent=document.getElementById('memo').value.length+'文字';}
 
-    selectedFormats.clear();
-    document.querySelectorAll('.sel-btn.fmt').forEach(b => b.classList.remove('active'));
+function selP(btn,val){
+  document.querySelectorAll('.p-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');S.purpose=val;
+}
 
-    if (mode === 'sns') {
-      document.getElementById('memo-input').placeholder = '思考・アイデア・気づきをここに入力...\n\n例）今日の商談で気づいたこと、読んだ記事の感想、伝えたいメッセージ';
-      selectedFormats = new Set(['X投稿（140文字）','Markdown']);
-    } else {
-      document.getElementById('memo-input').placeholder = '会議のメモをここにざっくり入力...\n\n例）\n・コスト削減を優先する方針に決定\n・山田さんが来週までにベンダー比較表を作る\n・リリース日は未定、来週再確認';
-      selectedFormats = new Set(['議事録','Taskリスト']);
-    }
+function selC(btn,type){
+  document.querySelectorAll('#'+type+'-chips .chip:not(#slack-chip)').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');S[type]=btn.textContent.trim();
+}
 
-    document.querySelectorAll('.sel-btn.fmt').forEach(btn => {
-      const val = btn.getAttribute('onclick').match(/'([^']+)'\)/)?.[1];
-      if (val && selectedFormats.has(val)) btn.classList.add('active');
-    });
+function toggleSlack(btn){
+  btn.classList.toggle('slack-on');
+  S.isSlack=btn.classList.contains('slack-on');
+  document.getElementById('slack-sub').style.display=S.isSlack?'block':'none';
+  if(S.isSlack){
+    document.querySelectorAll('#format-chips .chip:not(#slack-chip)').forEach(b=>b.classList.remove('on'));
+    S.format='Slack';
+  } else {
+    S.format='指定なし';
+    document.querySelector('#format-chips .chip').classList.add('on');
   }
+}
 
-  function sel(btn, type, val) {
-    btn.closest('.btn-grid').querySelectorAll('.sel-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    if (type === 'struct') selectedStruct = val;
-  }
+const INST={
+  '議事録をまとめる':`以下のメモを元に議事録を作成してください。
 
-  function toggleFmt(btn, val) {
-    btn.classList.toggle('active');
-    if (btn.classList.contains('active')) selectedFormats.add(val);
-    else selectedFormats.delete(val);
-  }
-
-  function generate() {
-    const memo = document.getElementById('memo-input').value.trim();
-    if (!memo) { showToast('⚠️ メモを入力してください'); return; }
-    if (!selectedFormats.size) { showToast('⚠️ 出力フォーマットを選んでください'); return; }
-
-    let prompts = [];
-
-    if (currentMode === 'sns') {
-      const tone = document.getElementById('tone').value;
-      const length = document.getElementById('length').value;
-      const toneLabel = ['とても丁寧（敬語・ですます）','丁寧','普通','ややカジュアル','ラフ・フランク'][tone-1];
-      const lengthLabel = ['とても短く（100文字以内）','短め（200文字程度）','標準（400文字程度）','長め（600文字程度）','とても長く（800文字以上）'][length-1];
-      const persona = document.getElementById('persona').value.trim();
-      const fmts = [...selectedFormats].join('、');
-
-      const prompt = `あなたは優秀なコンテンツ編集者です。以下のメモを構造化して、指定されたフォーマットに変換してください。
-
-【メモ】
-${memo}
-
-【変換設定】
-- 構造化フレームワーク: ${selectedStruct}
-- トーン: ${toneLabel}
-- 長さ: ${lengthLabel}
-- 出力フォーマット: ${fmts}
-${persona ? `- 文体・ペルソナ: ${persona}` : ''}
-
-【出力指示】
-${[...selectedFormats].map(f => {
-  if (f === 'X投稿（140文字）') return `■ X投稿: 140文字以内で、思わず「いいね」したくなる投稿文を作成。冒頭1行でフックを作ること。`;
-  if (f === 'note記事') return `■ note記事: H1タイトル→H2見出し（3〜5個）→各セクション本文の構成で作成。導入と締めくくりを必ず含めること。`;
-  if (f === 'Markdown') return `■ Markdown: 見出し・箇条書きを使った構造化メモとして整理。`;
-  return `■ ${f}: 適切な形式で作成。`;
-}).join('\n')}
-
-各フォーマットを明確に区切って出力してください。`;
-
-      prompts.push({ label: 'SNS・発信用プロンプト', content: prompt });
-
-    } else {
-      const mtgName = document.getElementById('mtg-name').value;
-      const mtgDate = document.getElementById('mtg-date').value;
-      const mtgMembers = document.getElementById('mtg-members').value;
-      const fmts = [...selectedFormats];
-
-      if (fmts.includes('議事録')) {
-        prompts.push({
-          label: '📋 議事録生成プロンプト',
-          content: `あなたは優秀な議事録作成者です。以下の会議メモから、標準フォーマットの議事録を作成してください。
-
-【会議メモ】
-${memo}
-
-【MTG情報】
-- MTG名称: ${mtgName || '（未入力）'}
-- 日時: ${mtgDate || '（未入力）'}
-- 参加者: ${mtgMembers || '（未入力）'}
+【ハルシネーション防止ルール - 必ず守ること】
+- メモに記載されていない情報は絶対に追加・推測しないこと
+- 不明な項目は「（記載なし）」と記入すること
 
 【議事録フォーマット】
-# ■MTG基本情報
-- MTG名称:
-- 日時:
-- 参加者 [自社]:
-- 参加者 [他社]:
+# MTG基本情報
+- 名称・日時・参加者:（記載なし）
 
 ## 【1】決定事項
-※「意思決定された内容のみ」を箇条書きで記載
-・○○を○○に決定
+（メモから読み取れる意思決定のみ）
 
-## 【2】ToDo（Task）
-※必ず以下の4要素を含める形式で記載
-① オーナー（担当）/ 実務担当 ｜ 期日 ｜ 内容
-→ 完了条件: xxxxまで完了した状態
+## 【2】ToDo
+形式: 担当 | 期限 | 内容 → 完了条件
 
-## 【3】議題と協議内容
-アジェンダ順に「発言要約 + 結論 or 判断」を記載
+## 【3】議論の内容
 
-## 【4】保留事項・懸念点
-- 次回持ち越しの論点
-- 未確定事項
+## 【4】保留・未確定事項
 
-## 【5】次回会議
-- 日時:
-- 場所:`
-        });
-      }
+## 【5】次回`,
 
-      if (fmts.includes('Taskリスト')) {
-        prompts.push({
-          label: '✅ Taskリスト抽出プロンプト',
-          content: `以下の会議メモから、Taskを抽出して整理してください。
+  '文章を磨く':`以下の文章を改善してください。
 
-【会議メモ】
-${memo}
+【ルール】
+- 元の意味・事実・意図を変えないこと
+- 誤字脱字・文法ミスを修正すること
+- 言い回しを自然で読みやすくすること
+- 情報を追加・削除しないこと`,
 
-【Taskフォーマット】
-以下の4要素を必ず含めること：
-- オーナー（責任を持つ人）
-- 実務担当（手を動かす人）
-- 期限（必須）
-- 完了条件（曖昧禁止）
+  '構造化・整理する':`以下のメモを論理的に構造化してください。
 
-【NG例】「対応する」「検討する」
-【OK例】「Salesforceに項目作成しPicklist設定まで完了」
+【ルール】
+- メモにある情報のみを使うこと
+- 情報を追加・推測しないこと
+- 見出し・箇条書きで整理すること
+- 重複を除き、関連情報をグループ化すること`,
 
-【出力形式】
-① オーナー名（オーナー）/ 担当名（実働） ｜ 期日 ｜ タスク内容
-→ 完了条件: 具体的な完了状態を記述
+  '資料・スライドを作る':`以下の情報を元にスライド構成案を作成してください。
 
-全Taskを上記形式で列挙してください。`
-        });
-      }
+【ルール】
+- メモにある情報のみを使うこと
+- 各スライド: タイトル + 箇条書き3点以内
+- 情報が不足している箇所は「【要追記】」と明記すること`,
 
-      if (fmts.includes('note記事')) {
-        prompts.push({
-          label: '📝 note記事化プロンプト',
-          content: `以下の会議内容・意思決定をnote記事として書き直してください。
+  'SNS・発信文を作る':`以下のメモを元に発信文を作成してください。
 
-【素材】
-${memo}
+【ルール】
+- メモの内容を誇張・捏造しないこと
+- 事実と意見を明確に区別すること
+- 読者が誤解しないよう正確に表現すること`,
+
+  'タスクを分解する':`以下のタスク・目標を具体的なサブタスクに分解してください。
+
+【ルール】
+- メモに記載された情報の範囲で分解すること
+- 各タスク: 担当・期限・完了条件の枠を設けること
+- 推測でタスクを追加しないこと`,
+
+  'コードを書く':`以下の要件を元にコードを作成してください。
+
+【ルール】
+- 要件に記載されていない機能は追加しないこと
+- 不明な仕様は「// TODO: 要確認」コメントで明示すること
+- コードには日本語コメントを入れること
+- エラーハンドリングを含めること`,
+
+  '企画書・仕様書を作る':`以下の情報を元に文書を作成してください。
+
+【ハルシネーション防止ルール】
+- 記載されていない数値・効果は推測で記載しないこと
+- 不明な項目は「要検討」と記載すること
 
 【構成】
-1. 背景（なぜこの議論が必要だったか）
-2. 課題（何が問題だったか）
-3. 打ち手（何を決めたか）
-4. 実行（Task設計）
-5. 学び・再現性（他のケースにも使えるポイント）
+1. 概要・目的
+2. 背景・課題
+3. 提案内容
+4. 期待効果（記載情報の範囲内で）
+5. スケジュール・リソース
+6. 未確定事項リスト`
+};
 
-読者が「自分の仕事にも使えそう」と思える内容にしてください。`
-        });
-      }
+function generate(){
+  const memo=document.getElementById('memo').value.trim();
+  const extra=document.getElementById('extra').value.trim();
+  if(!memo){showToast('⚠️ メモを入力してください');return;}
+  if(!S.purpose){showToast('⚠️ 目的を選んでください');return;}
 
-      if (fmts.includes('X投稿')) {
-        prompts.push({
-          label: '𝕏 X投稿用プロンプト',
-          content: `以下の会議・意思決定内容を、140文字以内のX投稿に変換してください。
+  const base=INST[S.purpose]||`以下のメモを元に「${S.purpose}」を実施してください。\n\n【重要】メモにない情報は追加しないでください。`;
 
-【素材】
-${memo}
+  const conds=[];
+  if(S.target!=='指定なし')conds.push(`対象: ${S.target}`);
+  if(S.style!=='指定なし')conds.push(`スタイル: ${S.style}`);
+  if(S.isSlack)conds.push(`形式: Slack投稿（絵文字: ${S.emoji}）`);
+  else if(S.format!=='指定なし')conds.push(`形式: ${S.format}`);
 
-【型】
-会議の質 = 「決定事項」×「Taskの解像度」
+  const stageMap={
+    'Step1：構成のみ':'まず全体構成・骨格のみ出力してください。詳細な内容は書かないでください。',
+    'Step2：詳細を書く':'構成は決まっています。各セクションの詳細な内容を出力してください。',
+    'Step3：表現を磨く':'内容は決まっています。文体・表現・読みやすさを最終調整してください。'
+  };
+  const stageNote=stageMap[S.stage]?`\n\n【段階指定】\n${stageMap[S.stage]}`:'';
+  const condStr=conds.length?`\n\n【条件】\n${conds.map(c=>'- '+c).join('\n')}`:'';
+  const extraStr=extra?`\n\n【補足情報】\n${extra}`:'';
 
-Taskは必ず4点で定義する
-・誰が
-・いつまでに
-・何を
-・どうなれば完了か
+  const prompt=`${base}${condStr}${extraStr}${stageNote}\n\n---\n【メモ・素材】\n${memo}`;
 
-ここまで定義できていないTaskは、ほぼ実行されない。
+  const icons={'議事録をまとめる':'📋','文章を磨く':'✨','構造化・整理する':'🗂️','資料・スライドを作る':'📊','SNS・発信文を作る':'📣','タスクを分解する':'✅','コードを書く':'💻','企画書・仕様書を作る':'📐'};
+  renderCards([{label:(icons[S.purpose]||'✦')+' '+S.purpose,content:prompt}]);
+}
 
-上記の型を参考に、読者が「確かに！」と思えるX投稿を作成してください。`
-        });
-      }
+function renderCards(cards){
+  document.getElementById('empty').style.display='none';
+  document.getElementById('pcount').textContent=cards.length+'件';
+  document.querySelectorAll('.card').forEach(c=>c.remove());
+  window._cards=cards;
+  cards.forEach((c,i)=>{
+    const el=document.createElement('div');
+    el.className='card';
+    el.innerHTML=`<div class="card-head"><span class="card-label">${esc(c.label)}</span><button class="copy-btn" onclick="cp(this,${i})">📋 コピー</button></div><div class="card-body">${esc(c.content)}</div>`;
+    document.getElementById('right-body').appendChild(el);
+  });
+  showToast('✅ 生成完了！コピーしてClaude/Geminiに貼り付けてください');
+}
 
-      if (fmts.includes('Slack要約')) {
-        prompts.push({
-          label: '💬 Slack要約プロンプト',
-          content: `以下の会議内容を、Slackに投稿する簡潔な要約にしてください。
+async function cp(btn,i){
+  try{
+    await navigator.clipboard.writeText(window._cards[i].content);
+    btn.textContent='✅ コピー済み';btn.classList.add('done');
+    setTimeout(()=>{btn.textContent='📋 コピー';btn.classList.remove('done');},2000);
+    showToast('📋 コピーしました！Claude.aiに貼り付けてください');
+  }catch{showToast('❌ コピーに失敗しました');}
+}
 
-【会議メモ】
-${memo}
-
-【フォーマット】
-■ ${mtgDate || '本日'}の${mtgName || 'MTG'}サマリー
-
-【決定事項】
-・
-
-【Action Items】
-・担当者 | 期限 | 内容
-
-【保留・次回確認】
-・
-
-※絵文字は使わず、シンプルにまとめてください。`
-        });
-      }
-    }
-
-    renderOutput(prompts);
-  }
-
-  function renderOutput(prompts) {
-    const area = document.getElementById('output-area');
-    area.innerHTML = prompts.map((p, i) => `
-      <div class="prompt-block">
-        <div class="prompt-block-header">
-          <span>${p.label}</span>
-          <button class="copy-btn" onclick="copyPrompt(this, ${i})">📋 コピー</button>
-        </div>
-        <div class="prompt-block-body" id="prompt-${i}">${escHtml(p.content)}</div>
-      </div>
-    `).join('');
-
-    window._prompts = prompts;
-  }
-
-  async function copyPrompt(btn, idx) {
-    const text = window._prompts[idx].content;
-    try {
-      await navigator.clipboard.writeText(text);
-      btn.textContent = '✅ コピー済み';
-      btn.classList.add('copied');
-      setTimeout(() => { btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
-      showToast('📋 コピーしました！Claude.aiに貼り付けてください');
-    } catch {
-      showToast('❌ コピーに失敗しました');
-    }
-  }
-
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg; t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2500);
-  }
-
-  function escHtml(s) {
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  }
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 </script>
 </body>
 </html>
